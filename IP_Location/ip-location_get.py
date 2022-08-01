@@ -1,22 +1,17 @@
-from bottle import get, request, run, template  
+from bottle import get, request, run, template
 import requests, json
 
-@get('/ip')                           
-def ip():
-    if request.query.get('ip'):
-        ip = request.query.get('ip')
-        response = requests.get(f"http://ip-api.com/json/{ip}")    # get method used to get or retrieve data from specified resource
+@get('/ip')
+@get('/ip/<ip_address>')
+def ip(ip_address=None):
+
+    result = None
+    if ip_address is not None:
+        response = requests.get(f"http://ip-api.com/json/{ip_address}")    # get method used to get or retrieve data from specified resource
         text = response.text
 
         result = json.loads(text)
-        return template('disp_table', rows=result)
-   
-    return '''
-        <form action = "/ip" method = "get">
-            IP: <input name="ip" type="text" />  
-            <input value = "IP" type = "submit" />
-        </form>
-        
-    '''   
+
+    return template('input_form.tpl', ip_address=ip_address, result=result)
 
 run(host='localhost', port=8080, debug=True, reloader = True)
